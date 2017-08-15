@@ -18,3 +18,11 @@
 (def vectors (split-into-vectors x-digit-number))
 
 (map (partial count) (remove-number-sequences-less-than-13 vectors))
+
+(convert-str-to-number-coll "1234568")
+
+(find-largest-product [1 2 3 4 5 5 5 5 1 2] 6)
+
+(for [vector vectors] [(find-largest-product
+                       (convert-str-to-number-coll vector) 4)
+                       vector])

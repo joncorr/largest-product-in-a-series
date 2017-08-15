@@ -1,24 +1,47 @@
 (ns largest-product-in-a-series.core
   (:gen-class)
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str])
+  (:import [java.lang.Integer]))
 
-(defn get-x-digit-number [filepath]
+(defn get-x-digit-str [filepath]
  (.replace (slurp filepath) "\r\n" ""))
 
-(defn split-into-vectors [x-digit-number]
- (str/split x-digit-number #"0"))
+(defn first-str [string]
+ (subs string 0 1))
 
-(defn length-less-than-13? [string]
- (if (or (str/blank? string) (< (count string) 13))
-   true
-   false))
+(defn rest-str [string]
+ (subs string 1))
 
-(def greater-than-13? (complement length-less-than-13?))
+(defn convert-str-to-number-coll [string]
+  (loop [result [] string string]
+   (if (empty? string)
+     result
+     (let [first (first-str string)
+           rest  (rest-str string)
+           first-no (Integer/parseInt first)]
+      (recur (conj result first-no) rest)))))
 
-(defn remove-number-sequences-less-than-13 [vectors]
- (filter greater-than-13? vectors))
+ (defn find-largest-product [vector-of-ints adjacent-digits]
+  (loop [largest-prod 0 nums vector-of-ints prev-nums []]
+     (if (empty? nums)
+       [largest-prod prev-nums]
+       (let [adjacent-nums (take adjacent-digits nums)
+             product (reduce * adjacent-nums)
+             remaining-nums (rest nums)]
+          (if (> product largest-prod)
+            (recur product remaining-nums adjacent-nums)
+            (recur largest-prod remaining-nums prev-nums))))))
 
 (defn -main
-  "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World!"))
+   (let [file-path "resources/1000digitnumber.txt"
+         x-digit-str (get-x-digit-str file-path)
+         x-digit-int (convert-str-to-number-coll x-digit-str)
+         adjacent-digits 13
+         int-vector (convert-str-to-number-coll x-digit-str)]
+         (prn (str "The largest product of "
+                   adjacent-digits
+                   " adjacent digits is "
+                    (find-largest-product
+                        int-vector
+                        adjacent-digits)))))
